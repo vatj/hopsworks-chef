@@ -33,3 +33,5 @@ ALTER TABLE `hopsworks`.`feature_store_activity` ADD CONSTRAINT `fsa_feature_vie
 
 ALTER TABLE `hopsworks`.`training_dataset` ADD COLUMN `start_time` TIMESTAMP NULL;
 ALTER TABLE `hopsworks`.`training_dataset` ADD COLUMN `end_time` TIMESTAMP NULL;
+
+ALTER TABLE `hopsworks`.`feature_store_expectation_suite` ADD COLUMN `expectation_suite` varchar(12000) COLLATE latin1_general_cs DEFAULT NULL;

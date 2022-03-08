@@ -2207,51 +2207,36 @@ CREATE TABLE IF NOT EXISTS `git_repository_remotes` (
                                           CONSTRAINT `git_repository_fk` FOREIGN KEY (`repository`) REFERENCES `git_repositories` (`id`) ON DELETE CASCADE
 ) ENGINE=ndbcluster AUTO_INCREMENT=6164 DEFAULT CHARSET=latin1 COLLATE=latin1_general_cs;
 
-CREATE TABLE IF NOT EXISTS `feature_store_expectation_suite` (
+
+CREATE TABLE IF NOT EXISTS `expectation_suite` (
                                 `id` int(11) NOT NULL AUTO_INCREMENT,
                                 `name` varchar(63) NOT NULL,
-                                `description` varchar(1000),
-                                `version` int DEFAULT 1,
-                                `feature_store_id` int(11) NOT NULL,
-                                `expectation_suite` varchar(12000) COLLATE latin1_general_cs DEFAULT NULL,
-                                PRIMARY KEY (`id`),
-                                CONSTRAINT `feature_store_fn_fk_1` FOREIGN KEY (`feature_store_id`) REFERENCES `feature_store` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION
-) ENGINE=ndbcluster DEFAULT CHARSET=latin1 COLLATE=latin1_general_cs;
-
-CREATE TABLE IF NOT EXISTS `feature_group_expectation_suite` (
-                                `id` int(11) NOT NULL AUTO_INCREMENT,
+                                -- `description` varchar(1000),
+                                -- `version` int DEFAULT 1,
                                 `feature_group_id` int(11) NOT NULL,
-                                `feature_store_expectation_suite_id` int(11) NOT NULL,
+                                -- `expectation_suite` varchar(12000) COLLATE latin1_general_cs DEFAULT NULL,
                                 PRIMARY KEY (`id`),
-                                CONSTRAINT `feature_group_fn_fk` FOREIGN KEY (`feature_group_id`) REFERENCES `feature_group` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION,
-                                CONSTRAINT `feature_store_expectation_suite_fn_fk` FOREIGN KEY (`feature_store_expectation_suite_id`) REFERENCES `feature_store_expectation_suite` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION
+                                CONSTRAINT `feature_group_fn_fk` FOREIGN KEY (`feature_group_id`) REFERENCES `feature_group` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION
 ) ENGINE=ndbcluster DEFAULT CHARSET=latin1 COLLATE=latin1_general_cs;
 
-CREATE TABLE IF NOT EXISTS `feature_store_expectation_suite_great_expectation` (
-                                                                `feature_store_expectation_suite_id` int(11) NOT NULL,
-                                                                `great_expectation_id` int(11) NOT NULL,
-                                                                PRIMARY KEY (`feature_store_expectation_suite_id`, `great_expectation_id`),
-                                                                CONSTRAINT `fk_fs_expectation_suite_id` FOREIGN KEY (`feature_store_expectation_suite_id`) REFERENCES `feature_store_expectation_suite` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION,
-                                                                CONSTRAINT `fk_great_expectation_id` FOREIGN KEY (`great_expectation_id`) REFERENCES `great_expectation` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION
-) ENGINE=ndbcluster DEFAULT CHARSET=latin1 COLLATE=latin1_general_cs;
+CREATE TABLE IF NOT EXISTS `suite_expectation_map` (
+    `expectation_suite_id` int(11) NOT NULL AUTO_INCREMENT,
+    `great_expectation_id` int(11) NOT NULL,
+    `kwargs` varchar(500) NOT NULL,
+    `meta` varchar(500) NOT NULL,
+    `expectation_type` varchar(250) NOT NULL,
+    PRIMARY KEY (`expectation_suite_id`, `great_expectation_id`),
+    CONSTRAINT `fk_expectation_suite_id` FOREIGN KEY (`expectation_suite_id`) REFERENCES `expectation_suite` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION,
+    CONSTRAINT `fk_great_expectation_id` FOREIGN KEY (`great_expectation_id`) REFERENCES `great_expectation` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION
+)
 
--- Issue here is that great expectations don't get deleted when suite gets deleted. Next thing to fix
 CREATE TABLE IF NOT EXISTS `great_expectation` (
     `id` int(11) NOT NULL AUTO_INCREMENT,
     `expectation_type` varchar(255) NOT NULL,
-    `kwargs` varchar(1000) NOT NULL,
-    `meta` varchar(1000) NOT NULL,
+    `default_kwargs` varchar(1000) NOT NULL,
      PRIMARY KEY (`id`)
 ) ENGINE=ndbcluster DEFAULT CHARSET=latin1 COLLATE=latin1_general_cs;
 
--- CREATE TABLE IF NOT EXISTS `great_expectation` (
---     `id` int(11) NOT NULL AUTO_INCREMENT,
---     `expectation_type` varchar(255) NOT NULL,
---     `kwargs` varchar(1000) NOT NULL,
---     `meta` varchar(1000) NOT NULL,
---     `feature_store_id` int(11) NOT NULL,
---     `feature_store_expectation_suite_id` int(11) NOT NULL,
---     PRIMARY KEY (`id`),
---     CONSTRAINT `feature_store_fn_fk_3` FOREIGN KEY (`feature_store_id`) REFERENCES `feature_store` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION,
---     CONSTRAINT `feature_store_expectation_suite_fn_fk_2` FOREIGN KEY (`feature_store_expectation_suite_id`) REFERENCES `feature_store_expectation_suite` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION
--- ) ENGINE=ndbcluster DEFAULT CHARSET=latin1 COLLATE=latin1_general_cs;
+-- TODO:
+-- ALTER TABLE `feature_group` ADD `expectation_suite_id` int(11);
+-- ALTER TABLE `expectation_suite` ADD ALL_DEFAULT_EXPECTATION_SUITE_FIELDS_FROM_GE

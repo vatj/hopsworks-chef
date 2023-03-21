@@ -119,7 +119,7 @@ CREATE TABLE IF NOT EXISTS `feature_monitoring_config` (
     `enabled` BOOLEAN DEFAULT TRUE,
     `feature_monitoring_type` tinyint(4) NOT NULL,
     `alert_config` VARCHAR(63) COLLATE latin1_general_cs, -- dummy this should become ref to another table
-    `scheduler_config` VARCHAR(63) COLLATE latin1_general_cs, -- dummy this should become ref to another table
+    `scheduler_config_id` INT(11),
     `job_id` INT(11) NOT NULL,
     `detection_window_config_id` INT(11),
     `reference_window_config_id` INT(11),
@@ -134,6 +134,7 @@ CREATE TABLE IF NOT EXISTS `feature_monitoring_config` (
     CONSTRAINT `detection_window_config_monitoring_config_fk` FOREIGN KEY (`detection_window_config_id`) REFERENCES `monitoring_window_config` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION,
     CONSTRAINT `reference_window_config_monitoring_config_fk` FOREIGN KEY (`reference_window_config_id`) REFERENCES `monitoring_window_config` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION,
     CONSTRAINT `statistics_comparison_config_monitoring_config_fk` FOREIGN KEY (`statistics_comparison_config_id`) REFERENCES `statistics_comparison_config` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION
+    CONSTRAINT `scheduler_config_fk` FOREIGN KEY (`scheduler_config_id`) REFERENCES `scheduler_config` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION
 ) ENGINE = ndbcluster DEFAULT CHARSET = latin1 COLLATE = latin1_general_cs;
 
 CREATE TABLE IF NOT EXISTS `feature_descriptive_statistics` (
@@ -170,8 +171,8 @@ CREATE TABLE IF NOT EXISTS `feature_monitoring_result` (
     `execution_id` INT(11) NOT NULL,  -- dummy this should become ref to another table
     `monitoring_time` timestamp DEFAULT CURRENT_TIMESTAMP,
     `shift_detected` BOOLEAN DEFAULT FALSE,
-    `detection_stats_id` INT(11) NOT NULL, -- dummy this should become ref to another table
-    `reference_stats_id` INT(11), -- dummy this should become ref to another table
+    `detection_stats_id` INT(11) NOT NULL,
+    `reference_stats_id` INT(11),
     `difference` FLOAT,
     PRIMARY KEY (`id`),
     CONSTRAINT `config_monitoring_result_fk` FOREIGN KEY (`feature_monitoring_config_id`) REFERENCES `feature_monitoring_config` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION,

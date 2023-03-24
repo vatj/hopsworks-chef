@@ -81,33 +81,16 @@ CREATE TABLE IF NOT EXISTS `statistics_comparison_config` (
     PRIMARY KEY (`id`)
 ) ENGINE = ndbcluster DEFAULT CHARSET = latin1 COLLATE = latin1_general_cs;
 
-CREATE TABLE IF NOT EXISTS `feature_descriptive_statistics` (
-    `id` int(11) NOT NULL AUTO_INCREMENT,
-    `feature_type` varchar(20) NOT NULL,
-    -- for any feature type
-    `count` BIGINT NOT NULL,
-    `completeness` FLOAT NULL,
-    `num_non_null_values` BIGINT NULL,
-    `num_null_values` BIGINT NULL,
-    `approx_num_distinct_values` BIGINT NULL,
-    -- for numerical features
-    `min` FLOAT NULL,
-    `max` FLOAT NULL,
-    `sum` FLOAT NULL,
-    `mean` FLOAT NULL,
-    `stddev` FLOAT NULL,
-    `percentiles` BLOB,
-    -- with exactUniqueness
-    `distinctness` FLOAT NULL,
-    `entropy` FLOAT NULL,
-    `uniqueness` FLOAT NULL,
-    `exact_num_distinct_values` BIGINT NULL,
-    -- for filtering
-    `start_time` TIMESTAMP NULL,    -- commit time
-    `end_time` TIMESTAMP NOT NULL,  -- commit time
-    `row_percentage` INT(11) NOT NULL,
-    PRIMARY KEY (`id`)
-) ENGINE = ndbcluster DEFAULT CHARSET = latin1 COLLATE = latin1_general_cs;
+CREATE TABLE IF NOT EXISTS `job_schedule` (
+    `id` int NOT NULL AUTO_INCREMENT,
+    `job_id` int NOT NULL,
+    `start_datetime` timestamp,
+    `enable` BOOLEAN NOT NULL,
+    `job_frequency` varchar(20) NOT NULL,
+    PRIMARY KEY (`id`),
+    UNIQUE KEY `job_id` (`job_id`),
+    CONSTRAINT `fk_schedule_job` FOREIGN KEY (`job_id`) REFERENCES `jobs` (`id`) ON DELETE CASCADE
+    ) ENGINE=ndbcluster DEFAULT CHARSET=latin1 COLLATE=latin1_general_cs;
 
 CREATE TABLE IF NOT EXISTS `feature_monitoring_config` (
     `id` INT(11) NOT NULL AUTO_INCREMENT,
@@ -133,8 +116,8 @@ CREATE TABLE IF NOT EXISTS `feature_monitoring_config` (
     CONSTRAINT `job_monitoring_config_fk` FOREIGN KEY (`job_id`) REFERENCES `jobs` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION,
     CONSTRAINT `detection_window_config_monitoring_config_fk` FOREIGN KEY (`detection_window_config_id`) REFERENCES `monitoring_window_config` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION,
     CONSTRAINT `reference_window_config_monitoring_config_fk` FOREIGN KEY (`reference_window_config_id`) REFERENCES `monitoring_window_config` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION,
-    CONSTRAINT `statistics_comparison_config_monitoring_config_fk` FOREIGN KEY (`statistics_comparison_config_id`) REFERENCES `statistics_comparison_config` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION
-    CONSTRAINT `scheduler_config_fk` FOREIGN KEY (`scheduler_config_id`) REFERENCES `scheduler_config` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION
+    CONSTRAINT `statistics_comparison_config_monitoring_config_fk` FOREIGN KEY (`statistics_comparison_config_id`) REFERENCES `statistics_comparison_config` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION,
+    CONSTRAINT `scheduler_config_fk` FOREIGN KEY (`scheduler_config_id`) REFERENCES `job_scheduler` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION
 ) ENGINE = ndbcluster DEFAULT CHARSET = latin1 COLLATE = latin1_general_cs;
 
 CREATE TABLE IF NOT EXISTS `feature_descriptive_statistics` (
@@ -179,14 +162,3 @@ CREATE TABLE IF NOT EXISTS `feature_monitoring_result` (
     CONSTRAINT `detection_stats_monitoring_result_fk` FOREIGN KEY (`detection_stats_id`) REFERENCES `feature_descriptive_statistics` (`id`) ON DELETE NO ACTION,
     CONSTRAINT `reference_stats_monitoring_result_fk` FOREIGN KEY (`reference_stats_id`) REFERENCES `feature_descriptive_statistics` (`id`) ON DELETE NO ACTION
 ) ENGINE = ndbcluster DEFAULT CHARSET = latin1 COLLATE = latin1_general_cs;
-
-CREATE TABLE IF NOT EXISTS `job_schedule` (
-    `id` int NOT NULL AUTO_INCREMENT,
-    `job_id` int NOT NULL,
-    `start_datetime` timestamp,
-    `enable` BOOLEAN NOT NULL,
-    `job_frequency` varchar(20) NOT NULL,
-    PRIMARY KEY (`id`),
-    UNIQUE KEY `job_id` (`job_id`),
-    CONSTRAINT `fk_schedule_job` FOREIGN KEY (`job_id`) REFERENCES `jobs` (`id`) ON DELETE CASCADE
-    ) ENGINE=ndbcluster DEFAULT CHARSET=latin1 COLLATE=latin1_general_cs;

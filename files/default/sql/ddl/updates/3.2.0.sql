@@ -60,6 +60,7 @@ ALTER TABLE `hopsworks`.`tensorboard` DROP FOREIGN KEY `hdfs_user_id_fk`;
 ALTER TABLE `hopsworks`.`tensorboard` DROP INDEX `hdfs_user_id_fk`;
 ALTER TABLE `hopsworks`.`tensorboard` DROP COLUMN `hdfs_user_id`;
 
+
 CREATE TABLE IF NOT EXISTS `monitoring_window_config` (
     `id` INT(11) NOT NULL AUTO_INCREMENT,
     `window_config_type` INT(11) NOT NULL,
@@ -77,6 +78,34 @@ CREATE TABLE IF NOT EXISTS `statistics_comparison_config` (
     `relative` BOOLEAN DEFAULT FALSE,
     `threshold` FLOAT,
     `compare_on` INT(11) NOT NULL,
+    PRIMARY KEY (`id`)
+) ENGINE = ndbcluster DEFAULT CHARSET = latin1 COLLATE = latin1_general_cs;
+
+CREATE TABLE IF NOT EXISTS `feature_descriptive_statistics` (
+    `id` int(11) NOT NULL AUTO_INCREMENT,
+    `feature_type` varchar(20) NOT NULL,
+    -- for any feature type
+    `count` BIGINT NOT NULL,
+    `completeness` FLOAT NULL,
+    `num_non_null_values` BIGINT NULL,
+    `num_null_values` BIGINT NULL,
+    `approx_num_distinct_values` BIGINT NULL,
+    -- for numerical features
+    `min` FLOAT NULL,
+    `max` FLOAT NULL,
+    `sum` FLOAT NULL,
+    `mean` FLOAT NULL,
+    `stddev` FLOAT NULL,
+    `percentiles` BLOB,
+    -- with exactUniqueness
+    `distinctness` FLOAT NULL,
+    `entropy` FLOAT NULL,
+    `uniqueness` FLOAT NULL,
+    `exact_num_distinct_values` BIGINT NULL,
+    -- for filtering
+    `start_time` TIMESTAMP NULL,    -- commit time
+    `end_time` TIMESTAMP NOT NULL,  -- commit time
+    `row_percentage` INT(11) NOT NULL,
     PRIMARY KEY (`id`)
 ) ENGINE = ndbcluster DEFAULT CHARSET = latin1 COLLATE = latin1_general_cs;
 

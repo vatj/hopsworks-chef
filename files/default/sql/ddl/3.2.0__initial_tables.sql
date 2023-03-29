@@ -2336,7 +2336,7 @@ CREATE TABLE IF NOT EXISTS `job_schedule` (
     `id` int NOT NULL AUTO_INCREMENT,
     `job_id` int NOT NULL,
     `start_datetime` timestamp,
-    `enable` BOOLEAN NOT NULL,
+    `enabled` BOOLEAN NOT NULL,
     `job_frequency` varchar(20) NOT NULL,
     PRIMARY KEY (`id`),
     UNIQUE KEY `job_id` (`job_id`),
